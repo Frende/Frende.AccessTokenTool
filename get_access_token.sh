@@ -32,8 +32,7 @@ body="{
 
 base64_encode()
 {
-	declare input=${1:-$(</dev/stdin)}
-	printf '%s' "${input}" | openssl enc -base64 -A | tr '+/' '-_' | tr -d '=';
+	base64 | tr -d '\r\n=' | tr '+/' '-_'
 }
 rs256_sign()
 {
@@ -41,15 +40,15 @@ rs256_sign()
 	printf '%s' "${input}" | openssl dgst -binary -sha256 -sign "${key_file}"
 }
 
-header_base64=$(echo "${header}" | base64_encode )
-body_base64=$(echo "${body}" | base64_encode )
+header_base64=$(echo -n "${header}" | base64_encode )
+body_base64=$(echo -n "${body}" | base64_encode )
 
-header_body=$(echo "${header_base64}.${body_base64}")
-signature=$(echo "${header_body}" | rs256_sign | base64_encode )
+header_body=$(echo -n "${header_base64}.${body_base64}")
+signature=$(echo -n "${header_body}" | rs256_sign | base64_encode )
 
 assertion="${header_body}.${signature}"
 
 curl --request POST \
 	--url "${login_uri}/connect/token" \
 	--header 'content-type: application/x-www-form-urlencoded' \
-	--data "client_id=${client_id}&grant_type=affiliation&scope=agreement&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&client_assertion=${assertion}&customer_birth_number=${birth_number}"
+	--data "client_id=${client_id}&grant_type=affiliation&scope=agreement.read customerinformation&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&client_assertion=${assertion}&customer_birth_number=${birth_number}"
