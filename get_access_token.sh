@@ -26,8 +26,8 @@ body="{
 	\"iss\": \"${client_id}\",
 	\"sub\": \"${client_id}\",
 	\"aud\": \"${login_uri}/connect/token\",
-	\"jti\": \"$(date +%s)\",
-	\"exp\": $(date -d "+8 hours" +%s)
+	\"jti\": \"$(perl -E 'print time')\",
+	\"exp\": $(perl -E 'print time + 3600 * 8')
 }"
 
 base64_encode()
