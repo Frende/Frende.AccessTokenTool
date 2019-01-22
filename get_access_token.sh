@@ -40,11 +40,11 @@ rs256_sign()
 	printf '%s' "${input}" | openssl dgst -binary -sha256 -sign "${key_file}"
 }
 
-header_base64=$(echo -n "${header}" | base64_encode )
-body_base64=$(echo -n "${body}" | base64_encode )
+header_base64=$(printf "${header}" | base64_encode )
+body_base64=$(printf "${body}" | base64_encode )
 
-header_body=$(echo -n "${header_base64}.${body_base64}")
-signature=$(echo -n "${header_body}" | rs256_sign | base64_encode )
+header_body=$(printf "${header_base64}.${body_base64}")
+signature=$(printf "${header_body}" | rs256_sign | base64_encode )
 
 assertion="${header_body}.${signature}"
 
